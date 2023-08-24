@@ -24,8 +24,8 @@ class Post(models.Model):
     views = models.IntegerField(default=0)
     status = models.CharField(
         max_length=10,
-        choices=[('draft', 'Draft'), ('published', 'Published')],
-        default='draft'
+        choices=[('d', 'Draft'), ('p', 'Published')],
+        default='d'
     )
 
     def __str__(self):
