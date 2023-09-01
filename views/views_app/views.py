@@ -37,5 +37,63 @@ class AuthorList(ListView):
 class AuthorDetail(DetailView):
     model = Author
     context_object_name = 'author'
-    pk_url_kwarg = 'pk' # default
-    template_name = 'views_app/author_detail.html' # default
+
+
+class CreatePostView(CreateView): # modelformmixin
+    model = Post
+    fields = ['title', 'author', 'content', 'categories', 'status']
+    template_name = 'views_app/form.html'
+    success_url = '/posts/{id}'
+
+
+class DeletePostView(DeleteView):
+    model = Post
+    template_name = 'views_app/form.html'
+    success_url = '/posts/'
+
+
+class UpdatePostView(UpdateView):
+    model = Post
+    fields = ['title', 'author', 'content', 'categories', 'status']
+    success_url = '/posts/{id}'
+    template_name = 'views_app/form.html'
+
+class PostList(ListView):
+    model = Post
+    context_object_name = 'posts' # Author.objects.all()
+
+
+class PostDetail(DetailView):
+    model = Post
+    context_object_name = 'post'
+
+
+
+class CreateCategoryView(CreateView): 
+    model = Category
+    fields = '__all__'
+    template_name = 'views_app/form.html'
+    success_url = '/categories/{id}'
+
+
+class DeleteCategoryView(DeleteView):
+    model = Category
+    template_name = 'views_app/form.html'
+    success_url = '/categories/'
+
+
+class UpdateCategoryView(UpdateView):
+    model = Category
+    fields = '__all__'
+    success_url = '/categories/{id}'
+    template_name = 'views_app/form.html'
+
+
+class CategoryList(ListView):
+    model = Category
+    context_object_name = 'categories' 
+
+
+class CategoryDetail(DetailView):
+    model = Category
+    context_object_name = 'category'

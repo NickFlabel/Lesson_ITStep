@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Author</h1>
+        <p>#{{ category.pk }}</p>
+        <h4>{{ category.name }}</h4>
+        <h4>Posts:</h4>
+        {% for post in category.post_set.all %}
+        <ul>
+            <li>---</li>
+            <li>#{{ post.id }}</li>
+            <li><h4>{{ post.title }}</h4></li>
+            <li>{{ post.content }}</li>
+            <li>by {{ post.author.name }}</li> 
+            <li>Дата {{ post.pub_date }}</li>
+        </ul>
+    {% endfor %}
+    </body>
+</html>
