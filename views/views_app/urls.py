@@ -1,10 +1,22 @@
 from django.urls import path
-from .views import CreateAutorView, AuthorList, AuthorDetail, UpdateAuthorView, DeleteAuthorView
+from . import views
 
 urlpatterns = [
-    path('authors/', AuthorList.as_view(), name='author_list'),
-    path('authors/create/', CreateAutorView.as_view(), name='author_create'),
-    path('authors/<int:pk>/', AuthorDetail.as_view(), name='author_detail'),
-    path('authors/<int:pk>/update/', UpdateAuthorView.as_view(), name='author_update'),
-    path('authors/<int:pk>/delete/', DeleteAuthorView.as_view(), name='author_delete')
+    path('authors/', views.AuthorList.as_view(), name='author_list'),
+    path('authors/create/', views.CreateAutorView.as_view(), name='author_create'),
+    path('authors/<int:pk>/', views.AuthorDetail.as_view(), name='author_detail'),
+    path('authors/<int:pk>/update/', views.UpdateAuthorView.as_view(), name='author_update'),
+    path('authors/<int:pk>/delete/', views.DeleteAuthorView.as_view(), name='author_delete'),
+
+    path('posts/', views.PostList.as_view(), name='post_list'),
+    path('posts/create/', views.CreatePostView.as_view(), name='post_create'),
+    path('posts/<int:pk>/', views.PostDetail.as_view(), name='post_detail'),
+    path('posts/<int:pk>/update/', views.UpdatePostView.as_view(), name='post_update'),
+    path('posts/<int:pk>/delete/', views.DeletePostView.as_view(), name='post_delete'),
+
+    path('categories/', views.CategoryList.as_view(), name='category_list'),
+    path('categories/create/', views.CreateCategoryView.as_view(), name='category_create'),
+    path('categories/<int:pk>/', views.CategoryDetail.as_view(), name='category_detail'),
+    path('categories/<int:pk>/update/', views.UpdateCategoryView.as_view(), name='category_update'),
+    path('categories/<int:pk>/delete', views.DeleteCategoryView.as_view(), name='category_delete')
 ]
