@@ -15,5 +15,7 @@
             <li>Дата {{ post.pub_date }}</li>
         </ul>
     {% endfor %}
+    <p><a href="{% url 'category_update' pk=category.pk %}"></a>Update</p>
+    <p><a href="{% url 'category_delete' pk=category.pk %}"></a>Delete</p>
     </body>
 </html>

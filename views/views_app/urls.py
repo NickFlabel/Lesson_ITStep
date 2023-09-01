@@ -19,4 +19,7 @@ urlpatterns = [
     path('categories/<int:pk>/', views.CategoryDetail.as_view(), name='category_detail'),
     path('categories/<int:pk>/update/', views.UpdateCategoryView.as_view(), name='category_update'),
     path('categories/<int:pk>/delete', views.DeleteCategoryView.as_view(), name='category_delete'),
+
+    path('', views.MainPage.as_view(), name='main_page'),
+    path('paginator_authors/', views.paginator_view)
 ]
