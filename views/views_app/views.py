@@ -1,13 +1,18 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpRequest
+from django.http import HttpResponse, HttpResponseNotFound, HttpRequest, HttpResponseRedirect, HttpResponseBadRequest
 from .models import Author, Category, Post
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+
+from django.urls import reverse
+
+from . import forms
 
 
 class CreateAutorView(CreateView): # modelformmixin
@@ -50,6 +55,7 @@ class AuthorList(ListView):
     context_object_name = 'authors' # Author.objects.all()
     paginate_by = 2
 
+
 class AuthorDetail(DetailView):
     model = Author
     context_object_name = 'author'
@@ -57,7 +63,7 @@ class AuthorDetail(DetailView):
 
 class CreatePostView(CreateView): # modelformmixin
     model = Post
-    fields = ['title', 'author', 'content', 'categories', 'status']
+    form_class = forms.PostFormAlt
     template_name = 'views_app/form.html'
     success_url = '/posts/{id}'
 
@@ -74,9 +80,10 @@ class UpdatePostView(UpdateView):
     success_url = '/posts/{id}'
     template_name = 'views_app/form.html'
 
+
 class PostList(ListView):
     model = Post
-    context_object_name = 'posts' # Author.objects.all()
+    context_object_name = 'posts' # Post.objects.all()
 
 
 class PostDetail(DetailView):
@@ -139,4 +146,61 @@ def paginator_view(request: HttpRequest):
     return render(request, 'views_app/authors_paginator.html', context)
 
 
+class UserRegistrationView(FormView):
+    template_name = 'views_app/form.html'
+    form_class = forms.UserRegistrationForm
 
+    def form_valid(self, form):
+        return HttpResponse('form valid!')
+
+    def form_invalid(self, form):
+        return HttpResponse('form invalid')
+
+
+def add_record(request: HttpRequest):
+    if request.method == 'POST':
+        form = forms.SimpleForm(request.POST) # {'name': ..., 'description': ,,,}
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('category_list'))
+    elif request.method == 'GET':
+        form = forms.SimpleForm()
+        context = {'form': form}
+        return render(request, 'views_app/form.html', context)
+    else:
+        return HttpResponseBadRequest()
+
+
+def update_category(request: HttpRequest, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        form = forms.SimpleForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('category_detail', kwargs={'pk': pk}))
+        else:
+            return HttpResponseBadRequest()
+    elif request.method == 'GET':
+        form = forms.SimpleForm(instance=category) # initial
+        context = {'form': form}
+        return render(request, 'views_app/form.html', context)
+    else:
+        return HttpResponseBadRequest()
+
+
+def author_search(request: HttpRequest):
+    if request.method == 'POST':
+        form = forms.AuthorSearchForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['author_name']
+            author = Author.objects.filter(name__icontains=name).first()
+            if author:
+                return redirect('author_detail', pk=author.pk)
+            else:
+                messages.warning(request, 'Автор с этим ключем не был найден')
+                messages.warning(request, 'custom')
+    else:
+        form = forms.AuthorSearchForm()
+
+    context = {'form': form}
+    return render(request, 'views_app/form.html', context)
