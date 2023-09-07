@@ -25,5 +25,7 @@ urlpatterns = [
     path('user_registration/', views.UserRegistrationView.as_view()),
     path('create_category/', views.add_record),
     path('<int:pk>/', views.update_category),
-    path('author_search/', views.author_search)
+    path('author_search/', views.author_search),
+    path('authors_formset/', views.authors),
+    path('captcha/', views.CaptchaView.as_view())
 ]

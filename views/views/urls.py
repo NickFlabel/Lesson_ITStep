@@ -3,5 +3,7 @@ from django.contrib import admin
 
 urlpatterns = [
     path('', include('views_app.urls')),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+    path('captcha/', include('captcha.urls')),
+    path('accounts/', include('accounts.urls'))
 ]

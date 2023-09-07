@@ -204,3 +204,22 @@ def author_search(request: HttpRequest):
 
     context = {'form': form}
     return render(request, 'views_app/form.html', context)
+
+
+def authors(request):
+    if request.method == 'POST':
+        formset = forms.Formset(request.POST)
+        if formset.is_valid():
+            formset.save()
+            return redirect('author_list')
+    else:
+        formset = forms.Formset()
+        context = {'formset': formset}
+        return render(request, 'views_app/authors_formset.html', context)
+
+
+class CaptchaView(FormView):
+    form_class = forms.CaptchaForm
+    template_name = 'views_app/form.html'
+
+

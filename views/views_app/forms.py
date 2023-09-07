@@ -1,8 +1,19 @@
 from django import forms
 from .models import Author, Post, Category
-from django.forms import modelform_factory
+from django.forms import modelform_factory, modelformset_factory
 from django import forms
 from django.contrib.auth.models import User
+
+from captcha.fields import CaptchaField
+
+
+class CaptchaForm(forms.ModelForm):
+
+    captcha = CaptchaField()
+
+    class Meta:
+        model = Category
+        fields = '__all__'
 
 
 author_form = modelform_factory(Author, fields='__all__') # -> class
@@ -81,3 +92,6 @@ class SimpleForm(forms.ModelForm):
 
 class AuthorSearchForm(forms.Form):
     author_name = forms.CharField(max_length=100, label='Имя автора')
+
+
+Formset = modelformset_factory(Author, fields='__all__')
