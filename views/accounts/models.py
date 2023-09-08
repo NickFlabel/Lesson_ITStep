@@ -14,3 +14,6 @@ from django.contrib.auth.models import User
 # is_staff: BooleanField
 # is_superuser
 # perm <app_name><model_name><action>
+# date_joined
+# is_authenticated
+# is_a

@@ -7,7 +7,7 @@
 <body>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }} <!-- <p> -->
+        {{ formset.as_p }} <!-- <p> -->
         <button type="submit">Submit</button>
     </form>
     {% if messages %}

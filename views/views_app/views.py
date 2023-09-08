@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseNotFound, HttpRequest, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseNotFound, HttpRequest, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseForbidden
 from .models import Author, Category, Post
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
@@ -10,16 +10,20 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
+
 from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 
 from . import forms
 
 
-class CreateAutorView(CreateView): # modelformmixin
+class CreateAutorView(PermissionRequiredMixin, CreateView): # modelformmixin
     model = Author
     fields = '__all__'
     template_name = 'views_app/form.html'
     success_url = '/authors/{id}'
+    permission_required = ['...', '...']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,6 +137,7 @@ class MainPage(TemplateView):
         return context
 
 
+@user_passes_test(lambda user: user.is_superuser)
 def paginator_view(request: HttpRequest):
     authors = Author.objects.all()
     paginator = Paginator(authors, 2) # authors/?page=1
@@ -158,17 +163,20 @@ class UserRegistrationView(FormView):
 
 
 def add_record(request: HttpRequest):
-    if request.method == 'POST':
-        form = forms.SimpleForm(request.POST) # {'name': ..., 'description': ,,,}
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('category_list'))
-    elif request.method == 'GET':
-        form = forms.SimpleForm()
-        context = {'form': form}
-        return render(request, 'views_app/form.html', context)
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = forms.SimpleForm(request.POST) # {'name': ..., 'description': ,,,}
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(reverse('category_list'))
+        elif request.method == 'GET':
+            form = forms.SimpleForm()
+            context = {'form': form}
+            return render(request, 'views_app/form.html', context)
+        else:
+            return HttpResponseBadRequest()
     else:
-        return HttpResponseBadRequest()
+        return HttpResponseForbidden()
 
 
 def update_category(request: HttpRequest, pk):
@@ -188,6 +196,7 @@ def update_category(request: HttpRequest, pk):
         return HttpResponseBadRequest()
 
 
+@permission_required('view_app.view_post')
 def author_search(request: HttpRequest):
     if request.method == 'POST':
         form = forms.AuthorSearchForm(request.POST)
@@ -207,15 +216,18 @@ def author_search(request: HttpRequest):
 
 
 def authors(request):
-    if request.method == 'POST':
-        formset = forms.Formset(request.POST)
-        if formset.is_valid():
-            formset.save()
-            return redirect('author_list')
+    if request.user.has_perms(('views_app.add_author', 'views_app.change_author')):
+        if request.method == 'POST':
+            formset = forms.Formset(request.POST)
+            if formset.is_valid():
+                formset.save()
+                return redirect('author_list')
+        else:
+            formset = forms.Formset()
+            context = {'formset': formset}
+            return render(request, 'views_app/authors_formset.html', context)
     else:
-        formset = forms.Formset()
-        context = {'formset': formset}
-        return render(request, 'views_app/authors_formset.html', context)
+        return HttpResponseForbidden()
 
 
 class CaptchaView(FormView):

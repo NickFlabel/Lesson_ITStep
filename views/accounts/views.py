@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.views.generic import TemplateView
 
 # Create your views here.
 
@@ -36,4 +37,14 @@ class UserPasswordChangeView(PasswordChangeView):
 class UserPasswordChangeDoneView(PasswordChangeDoneView):
     template_name = 'accounts/password_change_done.html'
     extra_context = {} # title
+
+
+class UserPermissions(TemplateView):
+    template_name = 'accounts/custom_template.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'Ваши разрешения'
+        context['data'] = self.request.user.get_all_permissions()
+        return context
 
