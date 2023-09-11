@@ -18,12 +18,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, 
 from . import forms
 
 
-class CreateAutorView(PermissionRequiredMixin, CreateView): # modelformmixin
+
+class CreateAutorView(UserPassesTestMixin, CreateView): # modelformmixin
     model = Author
     fields = '__all__'
     template_name = 'views_app/form.html'
     success_url = '/authors/{id}'
-    permission_required = ['...', '...']
+
+    def test_func(self):
+        return self.request.user.is_superuser
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -31,10 +34,11 @@ class CreateAutorView(PermissionRequiredMixin, CreateView): # modelformmixin
         return context
 
 
-class DeleteAuthorView(DeleteView):
+class DeleteAuthorView(PermissionRequiredMixin, DeleteView):
     model = Author
     template_name = 'views_app/form.html'
     success_url = '/authors/'
+    permission_required = 'views_app.delete_author'
 
 
 class UpdateAuthorView(UpdateView):
@@ -54,7 +58,7 @@ class UpdateAuthorView(UpdateView):
         return context
 
 
-class AuthorList(ListView):
+class AuthorList(LoginRequiredMixin, ListView):
     model = Author
     context_object_name = 'authors' # Author.objects.all()
     paginate_by = 2
@@ -109,11 +113,14 @@ class DeleteCategoryView(DeleteView):
     success_url = '/categories/'
 
 
-class UpdateCategoryView(UpdateView):
+class UpdateCategoryView(UserPassesTestMixin, UpdateView):
     model = Category
     fields = '__all__'
     success_url = '/categories/{id}'
     template_name = 'views_app/form.html'
+
+    def test_func(self):
+        return self.request.user == self.get_object().author.user
 
 
 class CategoryList(ListView):
@@ -179,6 +186,7 @@ def add_record(request: HttpRequest):
         return HttpResponseForbidden()
 
 
+@login_required
 def update_category(request: HttpRequest, pk):
     category = get_object_or_404(Category, pk=pk)
     if request.method == 'POST':
@@ -196,7 +204,7 @@ def update_category(request: HttpRequest, pk):
         return HttpResponseBadRequest()
 
 
-@permission_required('view_app.view_post')
+@permission_required('views_app.view_post')
 def author_search(request: HttpRequest):
     if request.method == 'POST':
         form = forms.AuthorSearchForm(request.POST)
