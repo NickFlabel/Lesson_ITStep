@@ -9,7 +9,7 @@ from captcha.fields import CaptchaField
 
 class CaptchaForm(forms.ModelForm):
 
-    captcha = CaptchaField()
+    # captcha = CaptchaField()
 
     class Meta:
         model = Category

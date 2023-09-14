@@ -21,13 +21,6 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('main_page')
     template_name = 'accounts/signup.html'
 
-    def form_valid(self, form):
-        Author = apps.get_model('views_app', 'Author')
-        self.object = form.save()
-        new_author = Author(name=self.object.username, user=self.object, bio='bio', email=self.object.email)
-        new_author.save()
-        return HttpResponseRedirect(self.get_success_url())
-
 
 class UserLoginView(LoginView):
     template_name = 'accounts/login.html'

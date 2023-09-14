@@ -18,7 +18,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, 
 from . import forms
 
 
-
 class CreateAutorView(UserPassesTestMixin, CreateView): # modelformmixin
     model = Author
     fields = '__all__'
@@ -98,19 +97,23 @@ class PostDetail(DetailView):
     model = Post
     context_object_name = 'post'
 
+# Написать тесты для Create, Delete, List
 
-
-class CreateCategoryView(CreateView): 
+class CreateCategoryView(UserPassesTestMixin, CreateView):
     model = Category
     fields = '__all__'
     template_name = 'views_app/form.html'
     success_url = '/categories/{id}'
 
+    def test_func(self):
+        return self.request.user.is_superuser
 
-class DeleteCategoryView(DeleteView):
+
+class DeleteCategoryView(PermissionRequiredMixin, DeleteView):
     model = Category
     template_name = 'views_app/form.html'
     success_url = '/categories/'
+    permission_required = 'views_app.delete_category'
 
 
 class UpdateCategoryView(UserPassesTestMixin, UpdateView):
@@ -123,7 +126,7 @@ class UpdateCategoryView(UserPassesTestMixin, UpdateView):
         return self.request.user == self.get_object().author.user
 
 
-class CategoryList(ListView):
+class CategoryList(LoginRequiredMixin, ListView):
     model = Category
     context_object_name = 'categories' 
 
