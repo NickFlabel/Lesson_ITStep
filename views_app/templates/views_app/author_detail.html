@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>{{ author.name }}</h1>
+    <p>{{ author.email }}</p>
+    <p>{{ author.bio }}</p>
+    <p><a href="{% url 'author_update' pk=author.pk %}">Update</a></p>
+    <p><a href="{% url 'author_delete' pk=author.pk %}">Delete</a></p>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends 'layouts/navbar.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<h2>{{ title }}</h2>
+<div>{{ data|unordered_list }}</div>
+{% else %}
+<p>Вам нужно войти в сеть</p>
+{% endif %}
+{% endblock %}

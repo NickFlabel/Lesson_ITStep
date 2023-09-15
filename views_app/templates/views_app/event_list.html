@@ -1,0 +1,9 @@
+{% extends 'layouts/navbar.html' %}
+
+{% block title %}Authors{% endblock %}
+
+{% block content %}
+    {% for event in events %} <!-- [autho1, author2...] -->
+    <p>{{ event.created_at }} - {{ event.content }}</p>
+    {% endfor %}
+{% endblock %}
