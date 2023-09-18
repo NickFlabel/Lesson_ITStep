@@ -22,7 +22,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='posts')
     categories = models.ManyToManyField(Category)
     views = models.IntegerField(default=0)
     status = models.CharField(

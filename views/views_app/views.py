@@ -10,6 +10,8 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
+from django.db import transaction
+
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
 from django.urls import reverse
@@ -172,21 +174,11 @@ class UserRegistrationView(FormView):
         return HttpResponse('form invalid')
 
 
+@transaction.atomic()
 def add_record(request: HttpRequest):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = forms.SimpleForm(request.POST) # {'name': ..., 'description': ,,,}
-            if form.is_valid():
-                form.save()
-                return HttpResponseRedirect(reverse('category_list'))
-        elif request.method == 'GET':
-            form = forms.SimpleForm()
-            context = {'form': form}
-            return render(request, 'views_app/form.html', context)
-        else:
-            return HttpResponseBadRequest()
-    else:
-        return HttpResponseForbidden()
+    Category.objects.create(name='Non-transactional category')
+    Category.objects.create(name='Transactional category')
+    raise Exception('Test')
 
 
 @login_required
