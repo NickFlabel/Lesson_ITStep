@@ -1,14 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <h1>{{ author.name }}</h1>
-    <p>{{ author.email }}</p>
-    <p>{{ author.bio }}</p>
-    <p><a href="{% url 'author_update' pk=author.pk %}">Update</a></p>
-    <p><a href="{% url 'author_delete' pk=author.pk %}">Delete</a></p>
-</body>
-</html>
+{% extends 'layouts/navbar.html' %}
+{% load bootstrap4 %}
+
+{% block title %}{{ author.name }}{% endblock %}
+
+{% block header %}Автор {{ author.name }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">{{ author.name }}</h1>
+                <p class="card-text">Email: {{ author.email }}</p>
+                <p class="card-text">Bio: {{ author.bio }}</p>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary" href="{% url 'author_update' pk=author.pk %}">Редактировать</a>
+                <a class="btn btn-danger" href="{% url 'author_delete' pk=author.pk %}">Удалить</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h2 class="mb-4">Посты данного автора</h2>
+        {% for post in page_obj %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h5>
+                    <p class="card-text">{{ post.content }}</p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Опубликовано: {{ post.pub_date }}</small>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        {% bootstrap_pagination page_obj %}
+    </div>
+{% endblock %}

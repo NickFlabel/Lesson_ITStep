@@ -2,7 +2,23 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class AuthorManager(models.Manager):
+
+    def get_authors_with_published_posts(self):
+        return self.filter(posts__status='p').distinct()
+
+
+class CategoryManager(models.Manager):
+
+    def get_categories_with_published_posts(self):
+        return self.filter(post_set__status='p').distinct()
+
+
 class Author(models.Model):
+
+    objects = models.Manager()
+    new_manager = CategoryManager()
+
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     bio = models.TextField()
@@ -11,7 +27,11 @@ class Author(models.Model):
     def __str__(self):
         return self.name
 
+
 class Category(models.Model):
+
+    objects = CategoryManager()
+
     name = models.CharField(max_length=50)
     description = models.TextField()
 

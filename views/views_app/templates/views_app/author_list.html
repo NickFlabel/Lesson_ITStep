@@ -1,16 +1,25 @@
 {% extends 'layouts/navbar.html' %}
+{% load bootstrap4 %}
 
 {% block title %}Authors{% endblock %}
 
+{% block header %}Список авторов{% endblock %}
+
 {% block content %}
-    {% for author in authors %} <!-- [autho1, author2...] -->
-    <p>{{ author.pk }}</p>
-    <p>{{ author.name }}</p>
-    <p>{{ author.bio }}</p>
-    <p>{{ author.email }}</p>
-    {% for post in posts %}
-    <p><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></p>
-    <p>{{ post.content }}</p>
-    {% endfor %}
-    {% endfor %}
+    <div class="container">
+        {% for author in authors %}
+            <div class="card md-3">
+                <div class="card-header">
+                    <h4 class="card-title"><a href="{% url 'author_detail' pk=author.pk %}">{{ author.name }}</a></h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Bio: {{ author.bio }}</p>
+                    <p class="card-text">Email: {{ author.email }}</p>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="d-flex justify-content-center">
+            {% bootstrap_pagination page_obj size='large' %}
+        </div>
+    </div>
 {% endblock %}

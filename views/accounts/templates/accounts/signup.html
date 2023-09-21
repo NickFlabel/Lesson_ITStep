@@ -1,12 +1,23 @@
 {% extends 'layouts/navbar.html' %}
+{% load bootstrap4 %}
 
-{% block title %}SignUp Page{% endblock %}
+{% block title %}Зарегестрироваться{% endblock %}
+
+{% block header %}Регистрация{% endblock %}
 
 {% block content %}
-    <h2>SignUp page</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Register</button>
-    </form>
+<div class="container mt-5">
+    <div class="row">
+        <h2>Форма регистрации</h2>
+        {% if user.is_authenticated %}
+            <p>Вы уже в сети</p>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary">Зарегестрироваться</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

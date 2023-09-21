@@ -1,22 +1,54 @@
+{% load bootstrap4 %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}My Site{% endblock %}</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='slim' %}
 </head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="{% url 'main_page' %}">Home</a></li>
-            <li><a href="{% url 'author_list' %}">Authors</a></li>
-            <li><a href="{% url 'category_list' %}">Categories</a></li>
-            <li><a href="{% url 'post_list' %}">Posts</a></li>
+<body class="container-fluid">
+    <header class="mb-4">
+        <h1 class="display-1 text-center">{% block header %}Навигационная панель{% endblock %}</h1>
+    </header>
+    <div class="row">
+        <ul class="col nav justify-content-end border">
+        {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'user_logout' %}">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    Профиль
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{% url 'user_permissions' %}">Мои разрешения</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'change_password' %}">Изменить пароль</a>
+                </div>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'user_login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'user_register' %}">Регистрация</a>
+            </li>
+            {% endif %}
         </ul>
-    </nav>
-    <div class="content">
-        {% block content %}
-
-        {% endblock %}
+    </div>
+    <div class="row">
+        <nav class="col-md-auto nav flex-column border">
+            <a class="nav-link" href="{% url 'main_page' %}">Home</a>
+            <a class="nav-link" href="{% url 'author_list' %}">Authors</a>
+            <a class="nav-link" href="{% url 'category_list' %}">Categories</a>
+            <a class="nav-link" href="{% url 'post_list' %}">Posts</a>
+        </nav>
+        <section class="col border py-2">
+            {% bootstrap_messages %}
+            {% block content %}
+            {% endblock %}
+        </section>
     </div>
 </body>
 </html>

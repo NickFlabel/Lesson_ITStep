@@ -9,9 +9,8 @@
     {% if update_text %}
         <p>Вы хотите {{ action }} запись {{ model }} с ключем {{ object.pk }}</p>
     {% endif %}
-    <form method="post">
+    <form method="post" action="/submit">
         {% csrf_token %}
-        {{ form.as_p }} <!-- <p> -->
         <button type="submit">Submit</button>
     </form>
     {% if messages %}

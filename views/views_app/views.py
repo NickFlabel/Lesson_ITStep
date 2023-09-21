@@ -69,6 +69,19 @@ class AuthorDetail(DetailView):
     model = Author
     context_object_name = 'author'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        author = context['author']
+        posts = author.posts.all()
+        paginator = Paginator(posts, 2)
+        page_number: int = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
+        messages.success(self.request, 'Все посты этого автора найдены')
+        messages.warning(self.request, 'Возникла проблема')
+        messages.error(self.request, 'Ошибка')
+        return context
+
 
 class CreatePostView(CreateView): # modelformmixin
     model = Post

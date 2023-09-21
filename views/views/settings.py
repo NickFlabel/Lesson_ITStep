@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     #  third party
     'captcha',
+    'bootstrap4',
 
     #local
     'views_app',

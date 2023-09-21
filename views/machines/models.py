@@ -20,13 +20,27 @@ class Kit(models.Model):
     count = models.IntegerField()
 
 
-class Article(models.Model):
+class Car(Machine):
+    max_speed = models.IntegerField()
+    # OneToOneField
+
+
+class AssemblyLine(Machine):
+    max_capacity = models.IntegerField()
+
+
+class Content(models.Model):
     title = models.CharField(max_length=40)
+
+    class Meta:
+        abstract = True
+
+
+class Article(Content):
     text = models.TextField(null=True, blank=True)
 
 
-class Photo(models.Model):
-    title = models.CharField(max_length=40)
+class Photo(Content):
     image = models.ImageField(upload_to='photos/', null=True, blank=True)
 
 
