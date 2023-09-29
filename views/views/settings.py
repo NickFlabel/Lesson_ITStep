@@ -42,16 +42,20 @@ INSTALLED_APPS = [
     #  third party
     'captcha',
     'bootstrap4',
+    'rest_framework',
+    'corsheaders',
 
     #local
     'views_app',
     'accounts',
-    'machines'
+    'machines',
+    'drf_app'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

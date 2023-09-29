@@ -95,3 +95,7 @@ class AuthorSearchForm(forms.Form):
 
 
 Formset = modelformset_factory(Author, fields='__all__')
+
+
+class SignedDataForm(forms.Form):
+    signed_data = forms.CharField()

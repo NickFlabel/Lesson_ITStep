@@ -58,11 +58,19 @@ class UpdateAuthorView(UpdateView):
         context['model'] = str(self.model)
         return context
 
+from django.http import JsonResponse
 
 class AuthorList(LoginRequiredMixin, ListView):
     model = Author
     context_object_name = 'authors' # Author.objects.all()
     paginate_by = 2
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        data = [{'id': obj.id, 'name': obj.name} for obj in queryset]
+
+        response = JsonResponse(data, safe=False)
+        return response
 
 
 class AuthorDetail(DetailView):
@@ -250,4 +258,36 @@ class CaptchaView(FormView):
     form_class = forms.CaptchaForm
     template_name = 'views_app/form.html'
 
+
+from django.core.signing import TimestampSigner, BadSignature, dumps, loads
+
+
+def form_view_signed_timestamp(request: HttpRequest):
+    value = [1, 2, 3, 4, 5]
+    form = forms.SignedDataForm()
+    signed_data = dumps(value)
+    context = {'value': signed_data, 'form': form}
+    if request.method == 'POST':
+        signed_data = request.POST['signed_data']
+        try:
+            data = loads(signed_data)
+            messages.add_message(request, messages.SUCCESS, f'Подпись проверена, данные: {data}')
+        except BadSignature:
+            messages.add_message(request, messages.ERROR, f'Подпись неверна')
+    return render(request, 'views_app/form.html', context)
+
+
+
+
+def get_author_json(request, pk):
+    author = get_object_or_404(Author, pk=pk)
+
+    data = {
+        'id': author.id,
+        'name': author.name
+    }
+
+    response = JsonResponse(data)
+
+    return response
 

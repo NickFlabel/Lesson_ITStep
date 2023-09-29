@@ -27,5 +27,7 @@ urlpatterns = [
     path('<int:pk>/', views.update_category),
     path('author_search/', views.author_search),
     path('authors_formset/', views.authors),
-    path('captcha/', views.CaptchaView.as_view())
+    path('captcha/', views.CaptchaView.as_view()),
+    path('signed_data/', views.form_view_signed_timestamp),
+    path('author_json/<int:pk>', views.get_author_json)
 ]
