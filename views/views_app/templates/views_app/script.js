@@ -1,13 +1,4 @@
-{% extends 'layouts/navbar.html' %}
 
-{% block title %}Главная страница{% endblock %}
-
-{% block content %}
-    <h1>Список авторов книг</h1>
-    <button id="loadAuthorsButton" class="btn btn-success mt-3">Загрузить авторов</button>
-    <ul id="authorList" class="list-group mt-3"></ul>
-
-    <script>
         function loadAuthors() {
             const url = 'http://127.0.0.1:8000/api/authors/';
 
@@ -38,10 +29,7 @@
             .catch(error => {
                 console.log(error);
             });
-        }
+        })}
 
         const loadAuthorsButton = document.getElementById('loadAuthorsButton');
         loadAuthorsButton.addEventListener('click', loadAuthors);
-    </script>
-
-{% endblock %}

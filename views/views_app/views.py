@@ -160,7 +160,7 @@ class CategoryDetail(DetailView):
 
 
 class MainPage(TemplateView):
-    template_name = 'views_app/main_page.html'
+    template_name = 'views_app/main.html'
 
     def get_context_data(self, **kwargs):
         context = {}
