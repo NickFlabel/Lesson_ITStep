@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'views_app',
     'accounts',
     'machines',
-    'drf_app'
+    'drf_app',
+    'HW'
 ]
 
 MIDDLEWARE = [

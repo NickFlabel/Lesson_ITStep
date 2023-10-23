@@ -4,23 +4,31 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework import mixins
+from rest_framework import viewsets
+
 # Create your views here.
 
+class AuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
 
-@api_view(['GET', 'POST'])
-def get_authors(request):
-    if request.method == 'GET':
-        authors = Author.objects.all()
-        serializer = AuthorSerializer(authors, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        data = request.data
-        serializer = AuthorSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+# @api_view(['GET', 'POST'])
+# def get_authors(request):
+#     if request.method == 'GET':
+#         authors = Author.objects.all()
+#         serializer = AuthorSerializer(authors, many=True)
+#         return Response(serializer.data)
+#
+#     elif request.method == 'POST':
+#         data = request.data
+#         serializer = AuthorSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=201)
+#         return Response(serializer.errors, status=400)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -70,7 +78,7 @@ def get_publisher(request, pk):
 
     elif request.method == 'PUT':
         data = request.data
-        serializer = PublisherSerializer(publisher, data=data)
+        serializer = PublisherSerializer(publisher, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from .models import Author, Location, Publisher, Book
+from .validators import number_of_letters_validator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from django.shortcuts import get_object_or_404
 
 
 class AuthorSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    name = serializers.CharField(max_length=100)
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=100, validators=[number_of_letters_validator])
     birthdate = serializers.DateField()
 
     def update(self, instance, validated_data):
@@ -18,6 +20,23 @@ class AuthorSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Author.objects.create(**validated_data)
 
+    class Meta:
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Author.objects.all(),
+                fields=['name', 'birthdate']
+            )
+        ]
+
+    #
+    # def validate(self, attrs):
+    #     if str(attrs['birthdate']) > '2020-01-01':
+    #         raise serializers.ValidationError('Дата рождения должна быть раньше, чем 2020-01-01')
+    #     if len(attrs['name']) < 3:
+    #         raise serializers.ValidationError("Длина имени должна быть больше трех символов")
+    #     return attrs
+
+
 class AuthorUpdateSerializer(AuthorSerializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100, required=False)
@@ -25,28 +44,48 @@ class AuthorUpdateSerializer(AuthorSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Location
         fields = '__all__'
 
 
 class PublisherSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(validators=[number_of_letters_validator,
+                                             UniqueValidator(queryset=Publisher.objects.all())])
+    location = LocationSerializer()
 
     class Meta:
         model = Publisher
         fields = '__all__'
 
-    def validate_name(self, value):
-        if len(value) < 3:
-            raise serializers.ValidationError('Имя должно быть больше трех символов')
-        return value
-
 
 class BookSerializer(serializers.ModelSerializer):
+    # {"title": "test", "pub_date": "2020-01-01", "authors": [{"name": "author_1", "birthdate": "2000-01-01"},
+    # {"name": "author_2", "birthdate": "1999-01-01"}], "publisher": {"name": "test", "location":
+    # {"name": "loc"}}}
+    publisher = PublisherSerializer()
+    authors = AuthorSerializer(many=True)
 
     class Meta:
         model = Book
         fields = '__all__'
+
+    def create(self, validated_data):
+        authors = validated_data.pop('authors') #  [{"name": "author_1", "birthdate": "2000-01-01"},
+    # {"name": "author_2", "birthdate": "1999-01-01"}]
+        publisher = validated_data.pop('publisher') # {"name": "test", "location": {"name": "loc"}}
+        location = publisher.pop('location') # {"name": "loc"}
+        location_created, created = Location.objects.get_or_create(**location) # (instance, created: bool)
+        publisher, created = Publisher.objects.get_or_create(**publisher, location=location_created)
+        created_authors = []
+        for author in authors:
+            author, created = Author.objects.get_or_create(**author)
+            created_authors.append(author)
+        book = Book.objects.create(**validated_data, publisher=publisher)
+        book.authors.set(created_authors)
+        return book
+
 
 
 

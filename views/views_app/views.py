@@ -249,7 +249,9 @@ def authors(request):
         else:
             formset = forms.Formset()
             context = {'formset': formset}
-            return render(request, 'views_app/authors_formset.html', context)
+            response = render(request, 'views_app/authors_formset.html', context)
+            response.set_cookie('random_cookie', 1)
+            return response
     else:
         return HttpResponseForbidden()
 
