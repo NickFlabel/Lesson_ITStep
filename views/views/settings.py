@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'rest_framework',
     'corsheaders',
+    'drf_yasg',
 
     #local
     'views_app',
