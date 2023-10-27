@@ -1,6 +1,2 @@
-Location и Publisher - нужно подключить к ним ViewSets
-
-Сделать к одному из них два action'а - один для detail, другой - для list
-
-
-
+Создайте коллекцию в Postman для get, post, put для books
+и post, get и put для authors

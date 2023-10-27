@@ -3,6 +3,8 @@ from .models import Author, Location, Publisher, Book
 from .validators import number_of_letters_validator
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
+from django.contrib.auth.models import User
+
 from django.shortcuts import get_object_or_404
 
 
@@ -70,5 +72,8 @@ class BookSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserSerializer(serializers.ModelSerializer):
 
-
+    class Meta:
+        fields = ['password', 'username', 'email']
+        model = User

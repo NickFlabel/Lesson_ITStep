@@ -1,5 +1,5 @@
-from .models import Author, Publisher, Book
-from .serializers import AuthorSerializer, PublisherSerializer, AuthorUpdateSerializer, BookSerializer
+from .models import Author, Publisher, Book, Location
+from .serializers import AuthorSerializer, LocationSerializer, PublisherSerializer, AuthorUpdateSerializer, BookSerializer, UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -10,13 +10,32 @@ from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from django.contrib.auth.hashers import make_password
+
+from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.contrib.auth import authenticate
+
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
 
+class LocationViewSet(viewsets.ModelViewSet):
+    serializer_class = LocationSerializer
+    queryset = Location.objects.all()
+
+
 class AuthorViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    queryset = Author.objects.all()
+    permission_classes = (IsAuthenticated,)
+    # list()
+    # retrieve(pk)
+    # create()
+    # update(pk)
+    # destroy(pk)
 
     @swagger_auto_schema(operation_description='Отдает все книги данного автора',
                          responses={200: BookSerializer(many=True)})
@@ -27,7 +46,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='two')
     def authors_with_two(self, request):
         authors = Author.objects.filter(name__icontains='2')
         serializer = AuthorSerializer(authors, many=True)
@@ -112,5 +131,36 @@ class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
 
 
+@api_view(['POST'])
+def authenticate_user(request):
+    try:
+        user = request.data
+        login = user['username']
+        password = user['password']
+        user = authenticate(request, username=login, password=password)
+        token = RefreshToken.for_user(user)
+
+        return Response({
+            'refresh': str(token),
+            'access': str(token.access_token)
+        })
+    except User.DoesNotExist or KeyError as e:
+        print(e)
+        return Response(status=404)
+
+
+class CreateUserView(APIView):
+
+    def post(self, request):
+        user = request.data
+        password = user.pop('password')
+        hashed_password = make_password(password)
+        print(password)
+        print(hashed_password)
+
+        serializer = UserSerializer(data={**user, 'password': hashed_password})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=201)
 
 
