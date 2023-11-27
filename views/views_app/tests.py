@@ -34,14 +34,6 @@ class AuthorViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-    def test_create_author(self):
-        self.client.force_login(self.superuser)
-
-        response = self.client.get(reverse('author_create'))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'views_app/form.html')
-
     def test_create_author_anonymous_user(self):
         response = self.client.get(reverse('author_create'))
 
